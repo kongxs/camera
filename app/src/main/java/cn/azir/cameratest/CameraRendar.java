@@ -66,6 +66,7 @@ public class CameraRendar implements GLSurfaceView.Renderer,
         mDirectDrawer.draw(mtx);
     }
 
+
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         LogUtils.error("onFrameAvailable");
