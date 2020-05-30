@@ -6,6 +6,8 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
+import cn.azir.cameratest.filter.GPUVideoGrayscaleFilter;
+import cn.azir.cameratest.filter.GPUVideoSaturationFilter;
 import cn.azir.cameratest.util.DisplayUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,5 +26,8 @@ public class MainActivity extends AppCompatActivity {
         params.height = p.y;
         float previewRate = DisplayUtil.getScreenRate(this); //默认全屏的比例预览
         gl_surface_view.setLayoutParams(params);
+
+
+        gl_surface_view.setFilter(new GPUVideoGrayscaleFilter());
     }
 }

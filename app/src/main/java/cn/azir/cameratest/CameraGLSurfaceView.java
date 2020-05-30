@@ -4,8 +4,12 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
+import cn.azir.cameratest.filter.GPUVideoFilter;
+
 public class CameraGLSurfaceView extends GLSurfaceView {
 
+
+    private CameraRendar renderer;
 
     public CameraGLSurfaceView(Context context) {
         this(context , null);
@@ -19,7 +23,8 @@ public class CameraGLSurfaceView extends GLSurfaceView {
 
     private void init() {
         setEGLContextClientVersion(2);
-        setRenderer(new CameraRendar(this));
+        renderer = new CameraRendar(this);
+        setRenderer(renderer);
     }
 
 
@@ -38,5 +43,9 @@ public class CameraGLSurfaceView extends GLSurfaceView {
         // TODO Auto-generated method stub
         super.onPause();
         CameraInterface.getInstance().doStopCamera();
+    }
+
+    public void setFilter(GPUVideoFilter filter) {
+        renderer.setFilter(filter);
     }
 }
