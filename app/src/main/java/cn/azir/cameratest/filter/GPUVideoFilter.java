@@ -8,6 +8,8 @@ import android.opengl.GLES20;
 
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
 
@@ -46,6 +48,12 @@ public class GPUVideoFilter {
     protected int mOutputWidth;
     protected int mOutputHeight;
     protected boolean mIsInitialized;
+
+    private float[] mPosCoordinate = {-1, -1, -1, 1, 1, -1, 1, 1};
+
+    private float[] mTexCoordinateBackRight = {1, 1, 0, 1, 1, 0, 0, 0};//顺时针转90并沿Y轴翻转  后摄像头正确，前摄像头上下颠倒
+    private float[] mTexCoordinateForntRight = {0, 1, 1, 1, 0, 0, 1, 0};//顺时针旋转90  后摄像头上下颠倒了，前摄像头正确
+
 
     public GPUVideoFilter() {
         this(NO_FILTER_VERTEX_SHADER, NO_FILTER_FRAGMENT_SHADER);
@@ -89,18 +97,28 @@ public class GPUVideoFilter {
         mOutputHeight = height;
     }
 
-    public void onDraw(final int textureId, final FloatBuffer cubeBuffer,
-                       final FloatBuffer textureBuffer) {
+    public void onDraw(final int textureId, FloatBuffer cubeBuffer,
+                       FloatBuffer textureBuffer) {
         GLES20.glUseProgram(mGLProgId);
         runPendingOnDrawTasks();
         if (!mIsInitialized) {
             return;
         }
 
+//        cubeBuffer = convertToFloatBuffer(mPosCoordinate);
+//
+////        if(camera_status == 0){
+//            textureBuffer = convertToFloatBuffer(mTexCoordinateBackRight);
+////        }else{
+////            mTexBuffer = convertToFloatBuffer(mTexCoordinateForntRight);
+////        }
+
         cubeBuffer.position(0);
         GLES20.glVertexAttribPointer(mGLAttribPosition, 2, GLES20.GL_FLOAT, false, 0, cubeBuffer);
         GLES20.glEnableVertexAttribArray(mGLAttribPosition);
         textureBuffer.position(0);
+
+
         GLES20.glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GLES20.GL_FLOAT, false, 0,
                 textureBuffer);
         GLES20.glEnableVertexAttribArray(mGLAttribTextureCoordinate);
@@ -264,5 +282,14 @@ public class GPUVideoFilter {
     public static String convertStreamToString(InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
+    }
+
+    private FloatBuffer convertToFloatBuffer(float[] buffer) {
+        FloatBuffer fb = ByteBuffer.allocateDirect(buffer.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        fb.put(buffer);
+        fb.position(0);
+        return fb;
     }
 }
